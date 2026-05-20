@@ -1,8 +1,9 @@
 import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { importHtmlDeck } from "../../src/deck/importHtml";
 
-const samplePath = "/Users/willma/Downloads/deepseek_html_20260519_8c8811.html";
+const samplePath = resolve(process.cwd(), "tests/fixtures/reference-deck.html");
 
 describe("importHtmlDeck", () => {
   it("imports the reference deck as 16 slides", () => {

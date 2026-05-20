@@ -1,10 +1,11 @@
 import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { applyEditOperation } from "../../src/deck/editOperations";
 import { exportHtmlDeck, exportHtmlSlide } from "../../src/deck/exportHtml";
 import { importHtmlDeck } from "../../src/deck/importHtml";
 
-const samplePath = "/Users/willma/Downloads/deepseek_html_20260519_8c8811.html";
+const samplePath = resolve(process.cwd(), "tests/fixtures/reference-deck.html");
 
 describe("exportHtmlDeck", () => {
   it("exports the imported deck as a single HTML file with manifest and edited text", () => {

@@ -1,9 +1,10 @@
 import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { buildPreviewHtml } from "../../src/deck/previewHtml";
 import { importHtmlDeck } from "../../src/deck/importHtml";
 
-const samplePath = "/Users/willma/Downloads/deepseek_html_20260519_8c8811.html";
+const samplePath = resolve(process.cwd(), "tests/fixtures/reference-deck.html");
 
 describe("buildPreviewHtml", () => {
   it("builds a static editor preview that strips deck runtime scripts and hides nav chrome", () => {

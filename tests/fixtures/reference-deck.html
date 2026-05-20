@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI公司工作流实战课 - 用ChatGPT搭建管理系统</title>
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #111122;
+            --border: #1a2a3a;
+            --cyan: #00e5ff;
+            --cyan-dim: #006880;
+            --purple: #b44dff;
+            --purple-dim: #4a1a6e;
+            --gold: #ffb347;
+            --text: #e0e0e8;
+            --text-secondary: #8899aa;
+            --glow-cyan: 0 0 30px rgba(0, 229, 255, 0.5), 0 0 60px rgba(0, 229, 255, 0.2);
+            --glow-purple: 0 0 30px rgba(180, 77, 255, 0.5), 0 0 60px rgba(180, 77, 255, 0.2);
+            --font-mono: 'SF Mono', 'Cascadia Code', 'Consolas', 'Monaco', monospace;
+            --font-sans: 'SF Pro Display', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            font-family: var(--font-sans);
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            user-select: none;
+            -webkit-user-select: none;
+            cursor: default;
+        }
+
+        /* ---- 粒子背景 ---- */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ---- 网格线背景 ---- */
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridShift 20s linear infinite;
+        }
+        @keyframes gridShift {
+            0% {
+                background-position: 0 0, 0 0;
+            }
+            100% {
+                background-position: 60px 60px, 60px 60px;
+            }
+        }
+
+        /* ---- 主容器 ---- */
+        #slides-container {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+        }
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0.96);
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            padding: 60px 80px;
+        }
+        .slide.active {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        /* ---- 装饰边角 ---- */
+        .corner-decor {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-color: var(--cyan);
+            border-style: solid;
+            z-index: 3;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        .corner-decor.tl {
+            top: 30px;
+            left: 30px;
+            border-width: 2px 0 0 2px;
+        }
+        .corner-decor.tr {
+            top: 30px;
+            right: 30px;
+            border-width: 2px 2px 0 0;
+        }
+        .corner-decor.bl {
+            bottom: 30px;
+            left: 30px;
+            border-width: 0 0 2px 2px;
+        }
+        .corner-decor.br {
+            bottom: 30px;
+            right: 30px;
+            border-width: 0 2px 2px 0;
+        }
+
+        /* ---- 页码指示器 ---- */
+        #page-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            gap: 10px;
+            pointer-events: none;
+        }
+        #page-indicator .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        #page-indicator .dot.active {
+            background: var(--cyan);
+            box-shadow: 0 0 12px var(--cyan), 0 0 24px rgba(0, 229, 255, 0.5);
+            border-color: var(--cyan);
+            width: 12px;
+            height: 12px;
+            margin-top: -1px;
+        }
+        #page-num {
+            position: fixed;
+            bottom: 60px;
+            right: 50px;
+            z-index: 100;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            letter-spacing: 3px;
+            pointer-events: none;
+        }
+
+        /* ---- 导航提示 ---- */
+        #nav-hint {
+            position: fixed;
+            bottom: 55px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 12px;
+            letter-spacing: 2px;
+            pointer-events: none;
+            transition: opacity 2s ease;
+        }
+
+        /* ---- 标题样式 ---- */
+        .slide-title {
+            font-size: clamp(32px, 5vw, 56px);
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--cyan) 0%, #80f0ff 30%, var(--purple) 70%, #d4a0ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 20px rgba(0, 229, 255, 0.4));
+            line-height: 1.25;
+        }
+        .slide-subtitle {
+            font-size: clamp(18px, 2.5vw, 26px);
+            color: var(--text-secondary);
+            letter-spacing: 4px;
+            text-align: center;
+            font-weight: 300;
+            margin-bottom: 30px;
+        }
+        .section-label {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            letter-spacing: 6px;
+            color: var(--cyan);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            text-align: center;
+            opacity: 0.8;
+        }
+
+        /* ---- 内容卡片 ---- */
+        .card-grid {
+            display: grid;
+            gap: 20px;
+            width: 100%;
+            max-width: 1100px;
+        }
+        .card-grid.cols-2 {
+            grid-template-columns: 1fr 1fr;
+        }
+        .card-grid.cols-3 {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+        .card-grid.cols-4 {
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px 24px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--cyan), var(--purple), transparent);
+            opacity: 0.5;
+        }
+        .card:hover {
+            border-color: rgba(0, 229, 255, 0.4);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.08), inset 0 0 30px rgba(0, 229, 255, 0.02);
+        }
+        .card-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+            display: block;
+        }
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+        .card-text {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .card-highlight {
+            color: var(--cyan);
+            font-weight: 600;
+        }
+        .card .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-family: var(--font-mono);
+            letter-spacing: 1px;
+            margin-top: 10px;
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            color: var(--cyan);
+            background: rgba(0, 229, 255, 0.05);
+        }
+
+        /* ---- 表格 ---- */
+        .table-wrap {
+            width: 100%;
+            max-width: 1000px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 15px;
+        }
+        table th {
+            background: rgba(0, 229, 255, 0.08);
+            color: var(--cyan);
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            letter-spacing: 1px;
+            border-bottom: 2px solid rgba(0, 229, 255, 0.25);
+            white-space: nowrap;
+        }
+        table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+            line-height: 1.5;
+        }
+        table tr:hover td {
+            background: rgba(0, 229, 255, 0.03);
+        }
+
+        /* ---- 大引号 ---- */
+        .quote-block {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            padding: 40px 20px;
+        }
+        .quote-block .quote-mark {
+            font-size: 100px;
+            line-height: 0.5;
+            color: var(--cyan);
+            opacity: 0.3;
+            font-family: Georgia, serif;
+        }
+        .quote-block .quote-text {
+            font-size: clamp(22px, 3.5vw, 32px);
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.5;
+            letter-spacing: 1px;
+            margin: 20px 0;
+        }
+        .quote-block .quote-author {
+            color: var(--text-secondary);
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+
+        /* ---- 流程图 ---- */
+        .flow-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 1000px;
+        }
+        .flow-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 22px;
+            text-align: center;
+            color: #fff;
+            font-weight: 600;
+            letter-spacing: 1px;
+            font-size: 15px;
+            position: relative;
+        }
+        .flow-item.cyan {
+            border-color: rgba(0, 229, 255, 0.5);
+            box-shadow: 0 0 16px rgba(0, 229, 255, 0.15);
+        }
+        .flow-item.purple {
+            border-color: rgba(180, 77, 255, 0.5);
+            box-shadow: 0 0 16px rgba(180, 77, 255, 0.15);
+        }
+        .flow-arrow {
+            font-size: 24px;
+            color: var(--cyan);
+            opacity: 0.6;
+        }
+
+        /* ---- 对比列 ---- */
+        .compare-row {
+            display: flex;
+            gap: 40px;
+            max-width: 1000px;
+            width: 100%;
+            align-items: stretch;
+        }
+        .compare-col {
+            flex: 1;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+        }
+        .compare-col.bad {
+            background: rgba(255, 80, 80, 0.06);
+            border: 1px solid rgba(255, 80, 80, 0.2);
+        }
+        .compare-col.good {
+            background: rgba(0, 229, 255, 0.05);
+            border: 1px solid rgba(0, 229, 255, 0.25);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.06);
+        }
+        .compare-col h3 {
+            font-size: 22px;
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+        }
+        .compare-col.bad h3 {
+            color: #ff6b6b;
+        }
+        .compare-col.good h3 {
+            color: var(--cyan);
+        }
+        .compare-col ul {
+            list-style: none;
+            text-align: left;
+            color: var(--text-secondary);
+            line-height: 2;
+            font-size: 15px;
+        }
+        .compare-col ul li::before {
+            content: '▸ ';
+            color: var(--text-secondary);
+        }
+
+        /* ---- 进度条 ---- */
+        .progress-bar-wrap {
+            width: 100%;
+            max-width: 600px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 4px;
+            margin: 20px auto;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--cyan), var(--purple));
+            border-radius: 4px;
+            transition: width 0.6s ease;
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+        }
+
+        /* ---- 响应式 ---- */
+        @media (max-width: 900px) {
+            .slide {
+                padding: 40px 24px;
+            }
+            .card-grid.cols-3,
+            .card-grid.cols-4 {
+                grid-template-columns: 1fr 1fr;
+            }
+            .card-grid.cols-2 {
+                grid-template-columns: 1fr;
+            }
+            .compare-row {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .flow-row {
+                flex-direction: column;
+            }
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+            .corner-decor {
+                width: 30px;
+                height: 30px;
+            }
+            .corner-decor.tl {
+                top: 15px;
+                left: 15px;
+            }
+            .corner-decor.tr {
+                top: 15px;
+                right: 15px;
+            }
+            .corner-decor.bl {
+                bottom: 15px;
+                left: 15px;
+            }
+            .corner-decor.br {
+                bottom: 15px;
+                right: 15px;
+            }
+            table {
+                font-size: 12px;
+            }
+            table th,
+            table td {
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 粒子画布 -->
+    <canvas id="particles"></canvas>
+    <!-- 网格背景 -->
+    <div class="grid-bg"></div>
+
+    <!-- 页码 -->
+    <div id="page-num">01 / 16</div>
+    <!-- 导航点 -->
+    <div id="page-indicator"></div>
+    <!-- 提示 -->
+    <div id="nav-hint">← → 或 点击屏幕左右区域切换 | 空格键 全屏</div>
+
+    <!-- ============ 幻灯片容器 ============ -->
+    <div id="slides-container">
+
+        <!-- ====== 第1页：封面 ====== -->
+        <div class="slide active" data-index="0">
+            <div class="corner-decor tl"></div><div class="corner-decor tr"></div>
+            <div class="corner-decor bl"></div><div class="corner-decor br"></div>
+            <div class="section-label">AI COMPANY WORKFLOW SYSTEM</div>
+            <div class="slide-title">用ChatGPT搭建<br>公司AI工作流</div>
+            <div class="slide-subtitle">管理 · 运营 · 培训 · 宣传 一次讲清楚</div>
+            <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-top:10px;">
+                <span style="color:var(--cyan);font-family:var(--font-mono);font-size:14px;letter-spacing:2px;">⚡ Projects</span>
+                <span style="color:var(--purple);font-family:var(--font-mono);font-size:14px;letter-spacing:2px;">🤖 GPTs</span>
+                <span style="color:var(--gold);font-family:var(--font-mono);font-size:14px;letter-spacing:2px;">🎨 AI作图</span>
+                <span style="color:#fff;font-family:var(--font-mono);font-size:14px;letter-spacing:2px;">📱 社媒矩阵</span>
+            </div>
+            <div style="margin-top:40px;color:var(--text-secondary);font-size:14px;letter-spacing:3px;">90分钟实战公开课</div>
+        </div>
+
+        <!-- ====== 第2页：核心定位 ====== -->
+        <div class="slide" data-index="1">
+            <div class="corner-decor tl"></div><div class="corner-decor tr"></div>
+            <div class="section-label">COURSE POSITIONING</div>
+            <div class="slide-title">这堂课真正要卖的<br>不是ChatGPT</div>
+            <div class="slide-subtitle">而是四个核心结果</div>
+            <div class="card-grid cols-4" style="max-width:1100px;">
+                <div class="card">
+                    <span class="card-icon">📋</span>
+                    <div class="card-title">公司管理变清楚</div>
+                    <div class="card-text">SOP流程、分工表、工作计划、接待流程、复盘表、培训手册<br><span class="card-highlight">老板脑中的经验→可执行的系统</span></div>
+                </div>
+                <div class="card">
+                    <span class="card-icon">🎓</span>
+                    <div class="card-title">员工培训变简单</div>
+                    <div class="card-text">入职流程、客服话术、考试题、岗位说明书、禁止事项<br><span class="card-highlight">新人上手从2周→2天</span></div>
+                </div>
+                <div class="card">
+                    <span class="card-icon">📱</span>
+                    <div class="card-title">社媒变成系统</div>
+                    <div class="card-text">选题库、笔记、朋友圈、短视频脚本、私信转化话术<br><span class="card-highlight">从"不知道发什么"到"发布日历"</span></div>
+                </div>
+                <div class="card">
+                    <span class="card-icon">🎨</span>
+                    <div class="card-title">宣传图快速产出</div>
+                    <div class="card-text">ChatGPT拆内容→AI生成视觉素材→人工审核<br><span class="card-highlight">宣传图+培训图批量生成</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== 第3页：开场痛点 ====== -->
+        <div class="slide" data-index="2">
+            <div class="corner-decor tl"></div><div class="corner-decor tr"></div>
+            <div class="section-label">WAKE-UP CALL</div>
+            <div class="slide-title" style="font-size:clamp(28px,4.5vw,48px);">你的公司是不是也这样？</div>
+            <div class="card-grid cols-2" style="max-width:900px;">
+                <div class="card">
+                    <div class="card-title">😫 靠老板亲自盯</div>
+                    <div class="card-text">事情太多、信息太散。员工问的问题、客户说的话、活动方案全散落在微信和聊天记录里。</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">😫 员工反复问重复问题</div>
+                    <div class="card-text">新人来了靠口头带，讲多少算多少。离职一个员工就带走一套说法。</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">😫 客服回复不统一</div>
+                    <div class="card-text">每个员工回复风格不一样，有人太冷淡有人太热情，客户体验非常混乱。</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">😫 社媒不知道发什么</div>
+                    <div class="card-text">小红书账号开了但选题枯竭，偶尔发一篇没有持续计划，评论区也没人管。</div>
+                </div>
+            </div>
+            <div class="quote-block" style="margin-top:20px;padding:20px;">
+                <div class="quote-text" style="font-size:clamp(18px,2.8vw,26px);">这节课结束后，你至少会知道如何搭建<strong style="color:var(--cyan);">4个东西</strong></div>
+                <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;color:#fff;font-size:16px;margin-top:10px;">
+                    <span style="border:1px solid var(--cyan);padding:6px 16px;border-radius:20px;">📁 管理Project</span>
+                    <span style="border:1px solid var(--purple);padding:6px 16px;border-radius:20px;">🤖 客服GPT</span>
+                    <span style="border:1px solid var(--gold);padding:6px 16px;border-radius:20px;">📱 运营GPT</span>
+                    <span style="border:1px solid #fff;padding:6px 16px;border-radius:20px;">🎨 AI作图流程</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== 第4页：认知升级 - 三个核心概念 ====== -->
+        <div class="slide" data-index="3">
+            <div class="corner-decor tl"></div><div class="corner-decor tr"></div>
+            <div class="section-label">CONCEPT FOUNDATION</div>
+            <div class="slide-title">三个核心概念</div>
+            <div class="slide-subtitle">搞清楚这些，才能真正用好ChatGPT</div>
+            <div class="card-grid cols-3" style="max-width:1100px;">
+                <div class="card" style="border-top:3px solid var(--cyan);">
+                    <span class="card-icon">💬</span>
+                    <div class="card-title">普通聊天</div>
+                    <div class="card-text">临时请一个<strong style="color:#ff6b6b;">聪明但健忘</strong>的助理。每次对话从零开始，不记得你的公司信息。<span class="tag">❌ 无记忆</span></div>
+                </div>
+                <div class="card" style="border-top:3px solid var(--purple);">
+                    <span class="card-icon">📁</span>
+                    <div class="card-title">Projects</div>
+                    <div class="card-text">给公司建一个<strong style="color:var(--cyan);">AI资料室</strong>。上传公司介绍、SOP、FAQ，AI始终了解你的背景。<span class="tag">✅ 有记忆</span></div>
+                </div>
+                <div class="card" style="border-top:3px solid var(--gold);">
+                    <span class="card-icon">🤖</span>
+                    <div class="card-title">GPTs</div>
+                    <div class="card-text">定制<strong style="color:var(--purple);">不同岗位的AI员工</strong>。设置指令、知识库、禁止事项，输出稳定可控。<span class="tag">✅ 有标准</span></div>
+                </div>
+            </div>
+            <div class="quote-block" style="padding:20px;margin-top:10px;">
+                <div class="quote-text" style="font-size:clamp(16px,2.2vw,22px);">
+                    ChatGPT普通聊天 = 临时请一个聪明助理<br>
+                    <span style="color:var(--cyan);">Projects</span> = 给公司建立AI资料室 &nbsp;|&nbsp;
+                    <span style="color:var(--purple);">GPTs</span> = 给公司定制AI岗位员工
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== 第5页：Projects详解 ====== -->
+        <div class="slide" data-index="4">
+            <div class="corner-decor tl"></div><div class="corner-decor tr"></div>
+            <div class="section-label">PROJECTS DEEP DIVE</div>
+            <div class="slide-title">Projects：公司的AI资料室</div>
+            <div class="slide-subtitle">把散落的信息放进一个长期的AI工作空间</div>
+            <div class="compare-row">
+                <div class="compare-col bad">
+                    <h3>❌ 没有Project时</h3>
+                    <ul>
+                        <li>每次对话从零开始</li>
+                        <li>需要反复介绍公司背景</li>
+                        <li>不同员工问出不同答案</li>
+                        <li>好内容用完即弃</li>
+                        <li>无法积累和复用</li>
+                    </ul>
+                </div>
+                <div class="compare-col good">
+                    <h3>✅ 有了Project之后</h3>
+                    <ul>
+                        <li>AI始终了解公司全部背景</li>
+                        <li>所有人基于同一套资料提问</li>
+                        <li>输出风格统一、信息准确</li>
+                        <li>优秀模板持续积累</li>
+                        <li>新员工也能快速上手</li>
+                    </ul>
+                </div>
+            </div>
+            <div style="margin-top:20px;color:var(--text-secondary);font-size:14px;text-align:center;letter-spacing:1px;">
+                上传文件支持 PDF / Word / Excel / TXT &nbsp;|&nbsp; 全局Instructions定义AI行为准则
+            </div>
+        </div>
+
+        <!-- ====== 第6页：GPTs详解 ====== -->
+        <div class="slide" data-index="5">
+            <div class="corner-decor tl"></div><div class="corner-decor tr"></div>
+            <div class="section-label">GPTs DEEP DIVE</div>
+            <div class="slide-title">GPTs：定制AI岗位员工</div>
+            <div class="slide-subtitle">把ChatGPT变成一个清楚自己岗位职责的专属助手</div>
+            <div class="card-grid cols-2" style="max-width:1000px;">
+                <div class="card">
+                    <div class="card-title">🧠 Instructions（指令）</div>
+                    <div class="card-text">定义AI的<strong>角色、行为方式、回复风格、约束条件</strong>。就像给新员工写岗位说明书。</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📚 Knowledge（知识库）</div>
+                    <div class="card-text">上传专属知识文件，让AI在特定领域有更深专业性。FAQ、SOP、品牌规范全放进去。</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">⚙️ Capabilities（能力）</div>
+                    <div class="card-text">启用网页搜索、图像生成、数据分析。让GPT不仅能写文案，还能直接出图。</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">🚀 Conversation Starters</div>
+                    <div class="card-text">预设常见问题的快捷入口。员工不需要会提问，点一下就能开始标准工作流。</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== 第7页：猫舍案例概览 ====== -->
+        <div class="slide" data-index="6">
+            <div class="corner-decor tl"></div><div class="corner-decor tr"></div>
+            <div class="section-label">REAL CASE: CATTERY</div>
+            <div class="slide-title">真实案例：福楽猫舎</div>
+            <div class="slide-subtitle">一个典型小公司的AI系统化改造</div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>业务环节</th>
+                            <th>以前的问题</th>
+                            <th>用AI后的结果</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>💬 客户咨询</td><td>每个员工回复不一样</td><td><strong style="color:var(--cyan);">统一客服话术</strong></td></tr>
+                        <tr><td>📅 预约看猫</td><td>时间地点注意事项容易漏</td><td><strong style="color:var(--cyan);">自动生成预约提醒</strong></td></tr>
+                        <tr><td>🐱 猫咪介绍</td><td>介绍不够专业或太啰嗦</td><td><strong style="color:var(--cyan);">生成标准介绍模板</strong></td></tr>
+                        <tr><td>🏠 售后服务</td><td>客户接猫后问题很多</td><td><strong style="color:var(--cyan);">7天/30天养护提醒系统</strong></td></tr>
+                        <tr><td>👤 员工培训</td><td>新人靠老员工口头带</td><td><strong style="color:var(--cyan);">培训手册和考试题</strong></td></tr>
+                        <tr><td>📱 小红书运营</td><td>不知道每天发什么</td><td><strong style="color:var(--cyan);">选题库和发布日历</strong></td></tr>
+                        <tr><td>🎨 宣传图片</td><td>找设计慢，成本高</td><td><strong style="color:var(--cyan);">AI生成图文封面和科普图</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ====== 第8页：Project搭建实操 ====== -->
+        <div class="slide" data-index="7">
+            <div class="corner-decor tl"></div><div class="corner-decor tr"></div>
+            <div class="section-label">HANDS-ON: PROJECT</div>
+            <div class="slide-title">实操第一步：搭建公司管理Project</div>
+            <div class="slide-subtitle">福楽猫舎运营管理Project 文件结构</div>
+            <div class="card-grid cols-2" style="max-width:1000px;">
+                <div class="card">
+                    <div class="card-title">📋 基础资料</div>
+                    <div class="card-text">公司介绍、猫咪品种介绍、价格说明规则、品牌定位、目标客户画像</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">💬 客户服务</div>
+                    <div class="card-text">常见问题FAQ、客服回复话术、投诉处理流程、售后回访模板</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">👥 员工管理</div>
+                    <div class="card-text">岗位职责、工作SOP、新人培训手册、考核标准、每周汇报模板</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📱 社媒与宣传</div>
+                    <div class="card-text">品牌人设、内容选题库、平台发布规范、爆款标题模板、活动流程</div>
+                </div>
+            </div>
+            <div style="margin-top:20px;text-align:center;color:var(--gold);font-size:15px;letter-spacing:1px;">
+                💡 花1小时建好Project，以后每天都能用。文件可以持续添加和更新。
+            </div>
+        </div>
+
+        <!-- ====== 第9页：GPTs创建实操 ====== -->
+        <div class="slide" data-index="8">
+            <div class="corner-decor tl"></div><div class="corner-decor tr"></div>
+            <div class="section-label">HANDS-ON: GPTs</div>
+            <div class="slide-title">实操第二步：创建专属GPTs</div>
+            <div class="slide-subtitle">猫舍可以做的AI岗位员工</div>
+            <div class="card-grid cols-4" style="max-width:1100px;">
+                <div class="card">
+                    <span class="card-icon">💬</span>
+                    <div class="card-title">客服GPT</div>
+                    <div class="card-text">统一回复咨询、介绍猫咪、说明流程、敏感问题提醒转人工</div>
+                    <span class="tag">稳定回复</span>
+                </div>
+                <div class="card">
+                    <span class="card-icon">📱</span>
+                    <div class="card-title">运营GPT</div>
+                    <div class="card-text">生成笔记、写科普、做封面标题、视频脚本、评论区互动</div>
+                    <span class="tag">内容矩阵</span>
+                </div>
+                <div class="card">
+                    <span class="card-icon">🎓</span>
+                    <div class="card-title">培训GPT</div>
+                    <div class="card-text">新员工学流程、根据SOP出考题、模拟客户咨询场景</div>
+                    <span class="tag">快速上手</span>
+                </div>
+                <div class="card">
+                    <span class="card-icon">🎨</span>
+                    <div class="card-title">品牌宣传GPT</div>
+                    <div class="card-text">写品牌故事、设计活动文案、生成海报文字和作图提示词</div>
+                    <span class="tag">视觉输出</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== 第10页：客服GPT现场演示 ====== -->
+        <div class="slide" data-index="9">
+            <div class="corner-decor tl"></div><div class="corner-decor tr"></div>
+            <div class="section-label">LIVE DEMO: CUSTOMER SERVICE GPT</div>
+            <div class="slide-title">现场创建一个"客服GPT"</div>
+            <div class="slide-subtitle">对比：普通ChatGPT vs 设置好的客服GPT</div>
+            <div class="compare-row">
+                <div class="compare-col bad">
+                    <h3>❌ 普通ChatGPT</h3>
+                    <ul>
+                        <li>可能编造价格</li>
+                        <li>语气忽冷忽热</li>
+                        <li>可能过度承诺</li>
+                        <li>不知道公司规范</li>
+                        <li>每次回复风格不同</li>
+                    </ul>
+                </div>
+                <div class="compare-col good">
+                    <h3>✅ 客服GPT（配置后）</h3>
+                    <ul>
+                        <li>严格基于公司资料</li>
+                        <li>语气温暖专业统一</li>
+                        <li>不承诺不编造</li>
+                        <li>敏感问题转人工</li>
+                        <li>输出格式标准化</li>
+                    </ul>
+                </div>
+            </div>
+            <div style="margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;max-width:800px;width:100%;">
+                <div style="color:var(--cyan);font-family:var(--font-mono);font-size:13px;margin-bottom:8px;">🔧 Instructions核心片段：</div>
+                <div style="color:var(--text-secondary);font-size:14px;line-height:1.7;">
+                    "你是福楽猫舎的客服助手。回复要礼貌、简洁、自然。<br>
+                    <span style="color:#ff6b6b;">不夸大承诺，不编造价格和服务。</span><br>
+                    遇到不确定信息要<span style="color:var(--gold);">提醒转人工确认</span>。<br>
+                    遇到投诉先安抚再收集信息。"
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== 第11页：内容矩阵 ====== -->
+        <div class="slide" data-index="10">
+            <div class="corner-decor tl"></div><div class="corner-decor tr"></div>
+            <div class="section-label">CONTENT MATRIX</div>
+            <div class="slide-title">一个主题 → 多种形式 → 多平台分发</div>
+            <div class="slide-subtitle">把公司视角翻译成客户视角</div>
+            <div class="flow-row" style="margin-bottom:20px;">
+                <div class="flow-item cyan">🎯 一个主题</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-item">📝 小红书笔记</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-item">🎬 短视频脚本</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-item purple">💬 朋友圈文案</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-item">📩 私信话术</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-item cyan">👤 员工培训版</div>
+            </div>
+            <div class="card-grid cols-2" style="max-width:900px;">
+                <div class="card">
+                    <div class="card-title">老板看到的是：</div>
+                    <div class="card-text" style="font-size:18px;color:#ff6b6b;">产品、服务、流程、成本</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">客户关心的是：</div>
+                    <div class="card-text" style="font-size:18px;color:var(--cyan);">价格、风险、体验、效果、信任感</div>
+                </div>
+            </div>
+            <div style="margin-top:16px;color:var(--gold);text-align:center;font-size:15px;letter-spacing:1px;">
+                💡 ChatGPT的价值就是把公司视角翻译成客户视角
+            </div>
+        </div>
+
+        <!-- ====== 第12页：AI作图工作流 ====== -->
+        <div class="slide" data-index="11">
+            <div class="corner-decor tl"></div><div class="corner-decor tr"></div>
+            <div class="section-label">AI IMAGE WORKFLOW</div>
+            <div class="slide-title">AI作图五步工作流</div>
+            <div class="slide-subtitle">先拆内容，再写文案，最后生成图像</div>
+            <div class="flow-row" style="flex-wrap:wrap;gap:12px;">
+                <div class="flow-item cyan" style="min-width:100px;">1️⃣ 定主题</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-item" style="min-width:100px;">2️⃣ 拆内容</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-item" style="min-width:100px;">3️⃣ 写文案</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-item purple" style="min-width:120px;">4️⃣ 生成提示词</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-item" style="min-width:120px;">5️⃣ 出图+审核</div>
+            </div>
+            <div class="card-grid cols-2" style="max-width:900px;margin-top:20px;">
+                <div class="card">
+                    <div class="card-title">🎨 对外宣传图</div>
+                    <div class="card-text">小红书封面、产品介绍图、活动海报、品牌故事图、客户案例图</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📋 内部培训图</div>
+                    <div class="card-text">SOP流程图、岗位职责图、检查清单、操作规范图、安全提醒图</div>
+                </div>
+            </div>
+            <div style="margin-top:16px;color:#ff6b6b;text-align:center;font-size:14px;letter-spacing:1px;">
+                ⚠️ 涉及价格、医疗、法律、合同的内容，必须人工审核后再发布
+            </div>
+        </div>
+
+        <!-- ====== 第13页：行业迁移 ====== -->
+        <div class="slide" data-index="12">
+            <div class="corner-decor tl"></div><div class="corner-decor tr"></div>
+            <div class="section-label">INDUSTRY MIGRATION</div>
+            <div class="slide-title">这套方法适合所有行业</div>
+            <div class="slide-subtitle">所有公司本质上都有四件事：管理人、服务客户、宣传自己、培训员工</div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>行业</th><th>管理Project</th><th>客服GPT</th><th>运营GPT</th><th>AI作图</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>💆 美业</td><td>服务项目、皮肤方案</td><td>回复效果/价格咨询</td><td>护肤科普、案例</td><td>皮肤图解、流程卡</td></tr>
+                        <tr><td>📚 教育</td><td>课程体系、师资</td><td>回复家长咨询</td><td>学习方法、学生案例</td><td>学习路径图</td></tr>
+                        <tr><td>🏠 房产</td><td>楼盘信息库、交易流程</td><td>推荐房源、解释税费</td><td>购房知识、区域分析</td><td>购房流程图</td></tr>
+                        <tr><td>🍽️ 餐饮</td><td>菜单、食材、SOP</td><td>预订、推荐、投诉</td><td>食材故事、节气营销</td><td>菜品图、卫生规范</td></tr>
+                        <tr><td>🐾 宠物</td><td>服务项目、品种介绍</td><td>咨询、预约、售后</td><td>养护知识、温馨故事</td><td>品种介绍图、SOP</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ====== 第14页：万能框架总结 ====== -->
+        <div class="slide" data-index="13">
+            <div class="corner-decor tl"></div><div class="corner-decor tr"></div>
+            <div class="section-label">UNIVERSAL FRAMEWORK</div>
+            <div class="slide-title">公司AI工作流模型</div>
+            <div class="slide-subtitle">资料 × 岗位 × 任务 × 输出</div>
+            <div class="flow-row" style="flex-wrap:wrap;gap:14px;">
+                <div class="flow-item cyan" style="font-size:18px;padding:20px 30px;">📁 资料层<br><small style="color:var(--text-secondary);">Projects</small></div>
+                <span class="flow-arrow" style="font-size:28px;">→</span>
+                <div class="flow-item purple" style="font-size:18px;padding:20px 30px;">🤖 岗位层<br><small style="color:var(--text-secondary);">GPTs</small></div>
+                <span class="flow-arrow" style="font-size:28px;">→</span>
+                <div class="flow-item" style="font-size:18px;padding:20px 30px;border-color:var(--gold);">📝 任务层<br><small style="color:var(--text-secondary);">Prompt模板</small></div>
+                <span class="flow-arrow" style="font-size:28px;">→</span>
+                <div class="flow-item" style="font-size:18px;padding:20px 30px;border-color:#fff;">📤 输出层<br><small style="color:var(--text-secondary);">文案/表格/图片</small></div>
+            </div>
+            <div class="quote-block" style="margin-top:30px;">
+                <div class="quote-mark">"</div>
+                <div class="quote-text" style="font-size:clamp(20px,3vw,30px);">
+                    ChatGPT真正的价值，不是帮你回答一个问题，<br>而是帮你<span style="color:var(--cyan);">把公司经验变成可复制的系统</span>。
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== 第15页：课后作业 ====== -->
+        <div class="slide" data-index="14">
+            <div class="corner-decor tl"></div><div class="corner-decor tr"></div>
+            <div class="section-label">HOMEWORK</div>
+            <div class="slide-title">课后作业：马上行动</div>
+            <div class="slide-subtitle">听完不是结束，回去做出成果才是开始</div>
+            <div class="card-grid cols-2" style="max-width:1000px;">
+                <div class="card">
+                    <div class="card-title">📁 作业1：建一个Project</div>
+                    <div class="card-text">公司介绍 + 服务项目 + 3条客户FAQ + 员工SOP</div>
+                    <span class="tag">预计30分钟</span>
+                </div>
+                <div class="card">
+                    <div class="card-title">🤖 作业2：创一个客服GPT</div>
+                    <div class="card-text">设置公司语气、禁止事项、上传FAQ、测试5个客户问题</div>
+                    <span class="tag">预计45分钟</span>
+                </div>
+                <div class="card">
+                    <div class="card-title">📱 作业3：做一套内容矩阵</div>
+                    <div class="card-text">选一个主题，拆成小红书+朋友圈+短视频脚本+私信话术</div>
+                    <span class="tag">预计30分钟</span>
+                </div>
+                <div class="card">
+                    <div class="card-title">🎨 作业4：做一套宣传图</div>
+                    <div class="card-text">封面+问题页+解决方案页+行动引导页，4页图文</div>
+                    <span class="tag">预计40分钟</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== 第16页：结束页 ====== -->
+        <div class="slide" data-index="15">
+            <div class="corner-decor tl"></div><div class="corner-decor tr"></div>
+            <div class="corner-decor bl"></div><div class="corner-decor br"></div>
+            <div class="section-label">THANK YOU</div>
+            <div class="slide-title">从今天开始<br>把ChatGPT升级为<br>公司AI工作系统</div>
+            <div class="slide-subtitle">管理 · 运营 · 培训 · 宣传</div>
+            <div style="margin-top:30px;display:flex;gap:20px;flex-wrap:wrap;justify-content:center;">
+                <span style="border:1px solid var(--cyan);padding:10px 24px;border-radius:30px;color:var(--cyan);font-size:16px;letter-spacing:2px;">📁 建一个Project</span>
+                <span style="border:1px solid var(--purple);padding:10px 24px;border-radius:30px;color:var(--purple);font-size:16px;letter-spacing:2px;">🤖 创一个GPT</span>
+                <span style="border:1px solid var(--gold);padding:10px 24px;border-radius:30px;color:var(--gold);font-size:16px;letter-spacing:2px;">📱 拆一套内容</span>
+            </div>
+            <div style="margin-top:40px;color:var(--text-secondary);font-size:14px;letter-spacing:3px;">课后资料包 · 模板 · Prompt合集 请联系领取</div>
+            <div style="margin-top:16px;color:rgba(255,255,255,0.4);font-size:13px;">Q&A 环节 · 欢迎提问</div>
+        </div>
+
+    </div><!-- /slides-container -->
+
+    <script>
+        (function() {
+            // ============ 粒子背景 ============
+            const canvas = document.getElementById('particles');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            const particleCount = 80;
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            class Particle {
+                constructor() {
+                    this.reset();
+                }
+                reset() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.vx = (Math.random() - 0.5) * 0.4;
+                    this.vy = (Math.random() - 0.5) * 0.4;
+                    this.size = Math.random() * 2 + 0.5;
+                    this.opacity = Math.random() * 0.5 + 0.15;
+                    this.life = Math.random() * 300 + 200;
+                    this.age = Math.random() * this.life;
+                }
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    this.age++;
+                    if (this.age > this.life || this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas
+                        .height) {
+                        this.reset();
+                        this.x = Math.random() * canvas.width;
+                        this.y = Math.random() * canvas.height;
+                        this.age = 0;
+                    }
+                }
+                draw() {
+                    const alpha = Math.sin((this.age / this.life) * Math.PI) * this.opacity;
+                    ctx.fillStyle = `rgba(0,229,255,${alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+
+            function animateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+                // 连线
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 150) {
+                            ctx.strokeStyle = `rgba(0,229,255,${0.04 * (1 - dist/150)})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(animateParticles);
+            }
+            animateParticles();
+
+            // ============ 幻灯片控制 ============
+            const slides = document.querySelectorAll('.slide');
+            const totalSlides = slides.length;
+            let currentIndex = 0;
+            const pageNumEl = document.getElementById('page-num');
+            const indicatorEl = document.getElementById('page-indicator');
+            const navHintEl = document.getElementById('nav-hint');
+
+            // 创建页码点
+            for (let i = 0; i < totalSlides; i++) {
+                const dot = document.createElement('span');
+                dot.className = 'dot';
+                if (i === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => goToSlide(i));
+                dot.style.pointerEvents = 'auto';
+                dot.style.cursor = 'pointer';
+                indicatorEl.appendChild(dot);
+            }
+
+            function updateSlide() {
+                slides.forEach((s, i) => {
+                    s.classList.toggle('active', i === currentIndex);
+                });
+                const dots = indicatorEl.querySelectorAll('.dot');
+                dots.forEach((d, i) => {
+                    d.classList.toggle('active', i === currentIndex);
+                });
+                pageNumEl.textContent =
+                    String(currentIndex + 1).padStart(2, '0') + ' / ' + String(totalSlides).padStart(2, '0');
+            }
+
+            function goToSlide(index) {
+                if (index < 0 || index >= totalSlides) return;
+                currentIndex = index;
+                updateSlide();
+                // 隐藏导航提示
+                navHintEl.style.opacity = '0';
+                clearTimeout(navHintEl._timeout);
+                navHintEl._timeout = setTimeout(() => { navHintEl.style.opacity = '1'; }, 3000);
+            }
+
+            function nextSlide() {
+                if (currentIndex < totalSlides - 1) goToSlide(currentIndex + 1);
+            }
+
+            function prevSlide() {
+                if (currentIndex > 0) goToSlide(currentIndex - 1);
+            }
+
+            // 键盘控制
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+                    e.preventDefault();
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    prevSlide();
+                } else if (e.key === 'Home') {
+                    e.preventDefault();
+                    goToSlide(0);
+                } else if (e.key === 'End') {
+                    e.preventDefault();
+                    goToSlide(totalSlides - 1);
+                } else if (e.key === 'f' || e.key === 'F') {
+                    // 全屏切换
+                    if (document.fullscreenElement) {
+                        document.exitFullscreen();
+                    } else {
+                        document.documentElement.requestFullscreen();
+                    }
+                }
+            });
+
+            // 点击屏幕左右区域翻页
+            document.addEventListener('click', (e) => {
+                // 如果点击的是dot或其他交互元素，不处理
+                if (e.target.closest('#page-indicator') || e.target.closest('button') || e.target.closest('a')) return;
+                const x = e.clientX;
+                const width = window.innerWidth;
+                if (x < width * 0.25) {
+                    prevSlide();
+                } else if (x > width * 0.75) {
+                    nextSlide();
+                }
+            });
+
+            // 触摸滑动
+            let touchStartX = 0;
+            let touchStartY = 0;
+            document.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            });
+            document.addEventListener('touchend', (e) => {
+                const dx = e.changedTouches[0].clientX - touchStartX;
+                const dy = e.changedTouches[0].clientY - touchStartY;
+                if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+                    if (dx < -30) nextSlide();
+                    else if (dx > 30) prevSlide();
+                }
+            });
+
+            // 滚轮
+            let wheelTimeout;
+            document.addEventListener('wheel', (e) => {
+                if (wheelTimeout) return;
+                wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 800);
+                if (e.deltaY > 20) nextSlide();
+                else if (e.deltaY < -20) prevSlide();
+            }, { passive: true });
+
+            // 初始化
+            updateSlide();
+            // 初始显示导航提示，几秒后淡出
+            navHintEl._timeout = setTimeout(() => { navHintEl.style.opacity = '0.3'; }, 8000);
+
+            console.log('🚀 AI公司工作流实战课 PPT 已就绪');
+            console.log('   ← → 方向键翻页 | 空格键全屏 | 点击屏幕左右区域翻页');
+            console.log('   共 ' + totalSlides + ' 页幻灯片');
+        })();
+    </script>
+</body>
+</html>

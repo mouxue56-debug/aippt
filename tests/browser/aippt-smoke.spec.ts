@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { expect, test } from "@playwright/test";
 
-const samplePath = "/Users/willma/Downloads/deepseek_html_20260519_8c8811.html";
+const samplePath = resolve(process.cwd(), "tests/fixtures/reference-deck.html");
 
 test("imports the sample deck and edits the first slide title", async ({ page }) => {
   const consoleErrors: string[] = [];
