@@ -1,0 +1,36 @@
+{
+  "name": "aippt",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc -b && vite build",
+    "build:public": "tsc -b && VITE_AIPPT_PUBLIC_MODE=${VITE_AIPPT_PUBLIC_MODE:-1} VITE_AIPPT_BASE_PATH=${VITE_AIPPT_BASE_PATH:-/tools/} vite build",
+    "package:public": "npm run build:public && node scripts/package-public-tools.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "smoke": "playwright test tests/browser/aippt-smoke.spec.ts"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "dom-serializer": "latest",
+    "domhandler": "latest",
+    "htmlparser2": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "vite": "latest"
+  },
+  "devDependencies": {
+    "@playwright/test": "latest",
+    "@testing-library/jest-dom": "latest",
+    "@testing-library/react": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "jsdom": "latest",
+    "typescript": "latest",
+    "vitest": "latest"
+  },
+  "packageManager": "pnpm@10.33.2+sha512.a90faf6feeab71ad6c6e57f94e0fe1a12f5dcc22cd754db40ae9593eb6a3e0b6b12e3540218bb37ae083404b1f2ce6db2a4121e979829b4aff94b99f49da1cf8"
+}
