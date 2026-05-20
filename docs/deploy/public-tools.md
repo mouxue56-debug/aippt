@@ -11,6 +11,11 @@
 - 不开放 URL 抓取导入，只允许用户选择本地 HTML 文件。
 - 用户内容在浏览器本地处理，保存草稿使用 `localStorage`，导出通过浏览器下载。
 
+如果只是临时给观众分享，优先使用 GitHub Pages：
+
+- 工具合集：`https://mouxue56-debug.github.io/aippt/`
+- 编辑器直达：`https://mouxue56-debug.github.io/aippt/#/aippt`
+
 ## Build
 
 ```bash

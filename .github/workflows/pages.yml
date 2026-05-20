@@ -29,6 +29,7 @@ jobs:
         env:
           VITE_AIPPT_BASE_PATH: /aippt/
           VITE_AIPPT_PUBLIC_MODE: "1"
+      - run: node scripts/prepare-github-pages.mjs
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

@@ -74,6 +74,7 @@ button:disabled {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
   max-width: 1040px;
   margin: 0 auto 28px;
 }
@@ -84,6 +85,9 @@ button:disabled {
 }
 
 .home-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: #c94d7a;
   border: 1px solid #ffbdd2;
   background: rgba(255, 255, 255, 0.82);
@@ -91,6 +95,13 @@ button:disabled {
   padding: 10px 14px;
   text-decoration: none;
   font-weight: 800;
+}
+
+.tools-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 .tools-intro,
@@ -117,6 +128,23 @@ button:disabled {
   margin: 0;
   color: var(--muted);
   line-height: 1.7;
+}
+
+.share-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.share-strip span {
+  border: 1px solid #d7f1e2;
+  background: rgba(239, 255, 246, 0.72);
+  border-radius: 999px;
+  color: #347b56;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px 10px;
 }
 
 .tool-grid {

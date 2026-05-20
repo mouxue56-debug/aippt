@@ -47,7 +47,8 @@ describe("ToolsHome", () => {
     render(<ToolsHome />);
 
     expect(screen.getByText("工具合集")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /HTML PPT 精修台/ })).toHaveAttribute("href", "/tools/aippt");
+    expect(screen.getByRole("link", { name: /HTML PPT 精修台/ })).toHaveAttribute("href", "/#/aippt");
+    expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute("href", "https://github.com/mouxue56-debug/aippt");
     expect(screen.queryByText(/Hermes|HMS/)).not.toBeInTheDocument();
   });
 });

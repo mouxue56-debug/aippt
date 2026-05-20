@@ -92,6 +92,7 @@ GitHub Pages is also configured for a public mirror. On `main` pushes, `.github/
 Current public mirror:
 
 - GitHub: `https://github.com/mouxue56-debug/aippt`
-- Pages: `https://mouxue56-debug.github.io/aippt/`
+- Tools home: `https://mouxue56-debug.github.io/aippt/`
+- Editor: `https://mouxue56-debug.github.io/aippt/#/aippt`
 
 Known boundary: importing arbitrary marketing sites is best-effort. The app can fetch and sectionize them, but a normal website is not always a native 16:9 slide deck. For high-quality SNS/course output, the stable workflow is still to generate HTML against `templates/prompts/HTML_PPT_GENERATOR_PROMPT.md`, then refine it here.

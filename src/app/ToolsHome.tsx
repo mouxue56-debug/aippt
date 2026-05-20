@@ -1,6 +1,8 @@
+import { editorHref } from "./publicMode";
+
 const tools = [
   {
-    href: "/tools/aippt",
+    href: editorHref(),
     title: "HTML PPT 精修台",
     badge: "可用",
     description: "导入 AI 生成的网页 PPT，在浏览器本地改文字、颜色、图片、页面顺序和动效，再导出单文件 HTML。",
@@ -16,12 +18,20 @@ export function ToolsHome() {
           <p className="eyebrow">福楽 AI Tools</p>
           <h1>工具合集</h1>
         </div>
-        <a href="https://fuluckai.com/" className="home-link">返回主页</a>
+        <div className="tools-header-actions">
+          <a href="https://github.com/mouxue56-debug/aippt" className="home-link">GitHub</a>
+          <a href="https://fuluckai.com/" className="home-link">返回主页</a>
+        </div>
       </header>
 
       <section className="tools-intro">
         <h2>视频里出现的 AI 工作流工具，会逐步放在这里。</h2>
         <p>公开版优先提供不需要账号、不上传服务器、观众能直接复刻的工具。涉及私有模型、内部接口和 API Key 的能力只保留在内部版。</p>
+        <div className="share-strip" aria-label="分享入口">
+          <span>公开预览：GitHub Pages</span>
+          <span>官网路径：fuluckai.com/tools</span>
+          <span>部署包：release/fuluckai-tools</span>
+        </div>
       </section>
 
       <section className="tool-grid" aria-label="工具列表">
