@@ -36,6 +36,18 @@ But this should only be deployed after the AIPPT public package is merged into t
 4. Add a navigation entry from `fuluckai.com/tools/` to the AIPPT editor.
 5. Keep internal AI/HMS/Hermes capabilities out of the public build.
 
+## Default Small-Tools Policy
+
+This repository is now the default maintenance home for public small tools used in Will's AI-blogger workflow.
+
+Unless a future tool clearly needs a separate backend or a separate repository:
+
+1. Add the tool to this AIPPT tools hub.
+2. Publish it through the same GitHub Pages workflow.
+3. Add a card on the tools home page.
+4. Keep the public version static or browser-local whenever possible.
+5. Keep private AI, HMS/Hermes, API-key, and internal workflow capabilities out of the public bundle.
+
 ## Current Public Boundary
 
 - Local HTML files only.
