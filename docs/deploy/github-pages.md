@@ -2,6 +2,18 @@
 
 公开仓库可以直接用 GitHub Pages 给观众预览和复刻。
 
+当前公开仓库：
+
+```txt
+https://github.com/mouxue56-debug/aippt
+```
+
+当前 Pages 地址：
+
+```txt
+https://mouxue56-debug.github.io/aippt/
+```
+
 默认 Actions 工作流：
 
 ```txt

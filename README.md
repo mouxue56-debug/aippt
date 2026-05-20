@@ -10,7 +10,7 @@ The goal is not to clone PowerPoint. The goal is to make AI-generated web PPTs c
 2. Ask another AI to generate a deck against that specification.
 3. Import the generated single-file HTML deck into AIPPT.
 4. Manually refine text, color, image, layout, and motion.
-5. Use HMS/Hermes for deeper single-slide or component-level AI edits.
+5. In the internal edition, use HMS/Hermes for deeper single-slide or component-level AI edits.
 6. Export a single-file HTML deck for filming, public courses, training, or live presentation.
 
 ## Current Source Sample
@@ -88,5 +88,10 @@ npm run package:public
 This writes `release/fuluckai-tools/`, including the `/tools/` static files plus Cloudflare `_redirects` and `_headers`.
 
 GitHub Pages is also configured for a public mirror. On `main` pushes, `.github/workflows/pages.yml` builds the public editor and publishes it under `/aippt/`; see `docs/deploy/github-pages.md`.
+
+Current public mirror:
+
+- GitHub: `https://github.com/mouxue56-debug/aippt`
+- Pages: `https://mouxue56-debug.github.io/aippt/`
 
 Known boundary: importing arbitrary marketing sites is best-effort. The app can fetch and sectionize them, but a normal website is not always a native 16:9 slide deck. For high-quality SNS/course output, the stable workflow is still to generate HTML against `templates/prompts/HTML_PPT_GENERATOR_PROMPT.md`, then refine it here.
