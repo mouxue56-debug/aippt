@@ -94,7 +94,8 @@ Current public mirror:
 - GitHub: `https://github.com/mouxue56-debug/aippt`
 - Tools home: `https://mouxue56-debug.github.io/aippt/`
 - Editor: `https://mouxue56-debug.github.io/aippt/#/aippt`
+- Storyboard slicer: `https://mouxue56-debug.github.io/aippt/#/storyboard-slicer`
 
-Small-tools policy: this repo is now the default public tools hub for Will's AI-blogger workflow. New public viewer-facing tools should be added here and published through GitHub Pages unless they clearly need a separate backend or repository.
+Web-tools policy: this repo is now the default public web tools hub for Will's AI-blogger workflow. New public viewer-facing tools should be added here and published through GitHub Pages unless they clearly need a separate backend or repository.
 
 Known boundary: importing arbitrary marketing sites is best-effort. The app can fetch and sectionize them, but a normal website is not always a native 16:9 slide deck. For high-quality SNS/course output, the stable workflow is still to generate HTML against `templates/prompts/HTML_PPT_GENERATOR_PROMPT.md`, then refine it here.

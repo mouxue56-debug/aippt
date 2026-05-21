@@ -42,6 +42,11 @@ export function isToolsHomePath(
   return route === "/tools" || (publicBuild && route === "/");
 }
 
+export function isStoryboardSlicerPath(pathname = window.location.pathname, hash = window.location.hash, basePath = configuredBasePath()): boolean {
+  const route = publicRoute(pathname, hash, basePath);
+  return route === "/storyboard-slicer" || route === "/tools/storyboard-slicer";
+}
+
 export function isPublicMode(
   pathname = window.location.pathname,
   hash = window.location.hash,
@@ -56,4 +61,10 @@ export function editorHref(basePath = configuredBasePath(), pathname = window.lo
   const baseHref = publicBaseHref(basePath);
   if (normalizePath(basePath) === "/tools" || normalizePath(pathname).startsWith("/tools")) return "/tools/aippt";
   return `${baseHref}#/aippt`;
+}
+
+export function storyboardSlicerHref(basePath = configuredBasePath(), pathname = window.location.pathname): string {
+  const baseHref = publicBaseHref(basePath);
+  if (normalizePath(basePath) === "/tools" || normalizePath(pathname).startsWith("/tools")) return "/tools/storyboard-slicer";
+  return `${baseHref}#/storyboard-slicer`;
 }

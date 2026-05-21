@@ -40,7 +40,7 @@ await writeFile(
     "",
     "合并后路径：",
     "",
-    "- `/tools/` -> 工具合集",
+    "- `/tools/` -> 网页工具合集",
     "- `/tools/aippt` -> HTML PPT 精修台公开版",
     "",
     "文件说明：",

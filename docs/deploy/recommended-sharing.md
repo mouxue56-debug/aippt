@@ -8,12 +8,18 @@ Use GitHub Pages first:
 https://mouxue56-debug.github.io/aippt/
 ```
 
-This is the cleanest link to share in videos, comments, and course materials right now. It opens a tools-style landing page and links to the public AIPPT editor.
+This is the cleanest link to share in videos, comments, and course materials right now. It opens the public web tools hub and links to the public AIPPT editor.
 
 Direct editor link:
 
 ```txt
 https://mouxue56-debug.github.io/aippt/#/aippt
+```
+
+Direct storyboard slicer link:
+
+```txt
+https://mouxue56-debug.github.io/aippt/#/storyboard-slicer
 ```
 
 The hash route is intentional. It works on GitHub Pages without requiring server-side rewrites.
@@ -36,17 +42,22 @@ But this should only be deployed after the AIPPT public package is merged into t
 4. Add a navigation entry from `fuluckai.com/tools/` to the AIPPT editor.
 5. Keep internal AI/HMS/Hermes capabilities out of the public build.
 
-## Default Small-Tools Policy
+## Default Web-Tools Policy
 
-This repository is now the default maintenance home for public small tools used in Will's AI-blogger workflow.
+This repository is now the default maintenance home for public web tools used in Will's AI-blogger workflow.
 
 Unless a future tool clearly needs a separate backend or a separate repository:
 
-1. Add the tool to this AIPPT tools hub.
+1. Add the tool to this web tools hub maintained in the AIPPT repo.
 2. Publish it through the same GitHub Pages workflow.
 3. Add a card on the tools home page.
 4. Keep the public version static or browser-local whenever possible.
 5. Keep private AI, HMS/Hermes, API-key, and internal workflow capabilities out of the public bundle.
+
+Current tools:
+
+- HTML PPT 精修台：`#/aippt`
+- 分镜格图裁切器：`#/storyboard-slicer`
 
 ## Current Public Boundary
 

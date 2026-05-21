@@ -1,7 +1,8 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./app/App";
-import { isToolsHomePath } from "./app/publicMode";
+import { isStoryboardSlicerPath, isToolsHomePath } from "./app/publicMode";
+import { StoryboardSlicer } from "./app/StoryboardSlicer";
 import { ToolsHome } from "./app/ToolsHome";
 import "./app/app.css";
 
@@ -18,7 +19,9 @@ function Root() {
     };
   }, []);
 
-  return isToolsHomePath() ? <ToolsHome /> : <App />;
+  if (isToolsHomePath()) return <ToolsHome />;
+  if (isStoryboardSlicerPath()) return <StoryboardSlicer />;
+  return <App />;
 }
 
 createRoot(document.getElementById("root") as HTMLElement).render(

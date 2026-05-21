@@ -2,8 +2,9 @@
 
 目标入口：
 
-- `/tools/`：福楽 AI 工具合集
+- `/tools/`：福楽 AI 网页工具合集
 - `/tools/aippt`：HTML PPT 精修台公开版
+- `/tools/storyboard-slicer`：分镜格图裁切器公开版
 
 公开版约束：
 
@@ -13,8 +14,9 @@
 
 如果只是临时给观众分享，优先使用 GitHub Pages：
 
-- 工具合集：`https://mouxue56-debug.github.io/aippt/`
+- 网页工具合集：`https://mouxue56-debug.github.io/aippt/`
 - 编辑器直达：`https://mouxue56-debug.github.io/aippt/#/aippt`
+- 分镜裁切器：`https://mouxue56-debug.github.io/aippt/#/storyboard-slicer`
 
 ## Build
 
@@ -51,11 +53,13 @@ release/fuluckai-tools/
 推荐路线：如果 `fuluckai.com` 主站是 Cloudflare Pages 或普通静态站：
 
 1. 将本项目 `dist/` 内容复制到主站的 `public/tools/` 或等效静态目录。
-2. 配置以下 fallback，让 `/tools/aippt` 返回 `/tools/index.html`：
+2. 配置以下 fallback，让工具子路径返回 `/tools/index.html`：
 
 ```txt
 /tools/aippt /tools/index.html 200
 /tools/aippt/* /tools/index.html 200
+/tools/storyboard-slicer /tools/index.html 200
+/tools/storyboard-slicer/* /tools/index.html 200
 ```
 
 3. 在主站导航添加 `/tools/` 入口。
@@ -78,14 +82,16 @@ npm run build:public
 
 - `https://fuluckai.com/tools/`
 - `https://fuluckai.com/tools/aippt`
+- `https://fuluckai.com/tools/storyboard-slicer`
 - 上传本地 HTML 文件后能编辑、保存、导出。
+- 上传本地分镜格图后能裁切、放大、导出小图。
 - 页面上不出现 `单页 AI`、`HMS`、`Hermes`、`导入网页`。
 
 ## Auto Recommendation
 
 结合当前知识库和线上验证，推荐优先级如下：
 
-1. **首选：合并进 fuluckai.com 主站的 Cloudflare Pages 发布目录。** 知识库记录 fuluckai.com 已经在 Cloudflare Pages 上运行，公开版 AIPPT 是纯静态工具，适合直接挂在 `/tools/`。这样不会新增一个抢根域的部署项目，也方便以后工具合集继续扩展。
+1. **首选：合并进 fuluckai.com 主站的 Cloudflare Pages 发布目录。** 知识库记录 fuluckai.com 已经在 Cloudflare Pages 上运行，公开版是纯静态网页工具，适合直接挂在 `/tools/`。这样不会新增一个抢根域的部署项目，也方便以后网页工具合集继续扩展。
 2. **备选：独立 Cloudflare Pages 子域。** 如果暂时找不到主站源码或主站构建流程不稳定，用 `tools.fuluckai.com` 或 `ppt.fuluckai.com` 先上线，等主站目录确认后再迁移到 `/tools/`。
 3. **不推荐：新项目直接绑定 fuluckai.com 根域。** 知识库里已有 aiblog 子站因为多个 Vercel 项目争抢同一 alias 导致 404 的历史，根域工具页也应避免同类问题。
 

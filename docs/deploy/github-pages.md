@@ -16,7 +16,7 @@ https://mouxue56-debug.github.io/aippt/
 
 分享结构：
 
-- `https://mouxue56-debug.github.io/aippt/`：工具合集首页，适合直接发给观众。
+- `https://mouxue56-debug.github.io/aippt/`：网页工具合集首页，适合直接发给观众。
 - `https://mouxue56-debug.github.io/aippt/#/aippt`：HTML PPT 精修台编辑器直达入口。
 
 默认 Actions 工作流：

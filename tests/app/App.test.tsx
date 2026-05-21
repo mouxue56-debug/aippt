@@ -46,8 +46,9 @@ describe("ToolsHome", () => {
   it("links the tools index to the public AIPPT editor", () => {
     render(<ToolsHome />);
 
-    expect(screen.getByText("工具合集")).toBeInTheDocument();
+    expect(screen.getByText("网页工具合集")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /HTML PPT 精修台/ })).toHaveAttribute("href", "/#/aippt");
+    expect(screen.getByRole("link", { name: /分镜格图裁切器/ })).toHaveAttribute("href", "/#/storyboard-slicer");
     expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute("href", "https://github.com/mouxue56-debug/aippt");
     expect(screen.queryByText(/Hermes|HMS/)).not.toBeInTheDocument();
   });
